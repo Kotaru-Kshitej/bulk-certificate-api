@@ -1,0 +1,23 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: bulk-certificate-api
+    runtime: python
+    plan: starter              # persistent disks need a paid plan (free plan = data wiped on restart)
+    region: singapore          # closest to India; change if you like
+    buildCommand: pip install -r requirements.txt
+    # Keep ONE worker: the background job thread + SQLite must live in a single process.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: CERT_DATA_DIR
+        value: /var/data/db
+      - key: CERT_OUTPUT_DIR
+        value: /var/data/output
+    disk:
+      name: cert-data
+      mountPath: /var/data
+      sizeGB: 1
