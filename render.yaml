@@ -1,10 +1,12 @@
-# Render Blueprint — https://render.com/docs/blueprint-spec
+# Render Blueprint (FREE plan) — https://render.com/docs/blueprint-spec
+# Note: on the free plan the filesystem is wiped on restart/redeploy/sleep,
+# so jobs and generated certificates are temporary. Fine for demos.
 services:
   - type: web
     name: bulk-certificate-api
     runtime: python
-    plan: starter              # persistent disks need a paid plan (free plan = data wiped on restart)
-    region: singapore          # closest to India; change if you like
+    plan: free
+    region: singapore
     buildCommand: pip install -r requirements.txt
     # Keep ONE worker: the background job thread + SQLite must live in a single process.
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
@@ -12,12 +14,4 @@ services:
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12.3
-      - key: CERT_DATA_DIR
-        value: /var/data/db
-      - key: CERT_OUTPUT_DIR
-        value: /var/data/output
-    disk:
-      name: cert-data
-      mountPath: /var/data
-      sizeGB: 1
+        value: 3.12.3s
